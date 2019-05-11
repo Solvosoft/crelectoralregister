@@ -1,0 +1,11 @@
+==> PADRON_COMPLETO.txt <==
+901420210,814005,1,20300204,00000,LUIS ALBERTO                  ,CAMPOS                    ,ACOSTA                    
+901420212,819001,2,20300204,00000,LUCIA ISABEL                  ,AGUILAR                   ,DISCUA                    
+901420217,110004,1,20300204,00000,ABRAHAM ISAAC                 ,SALAS                     ,MONTENEGRO                
+901420222,108005,2,20300204,00000,YASURI ODILYS                 ,CASTRO                    ,CRUZ                      
+901420362,110007,1,20300204,00000,BRAULIO JOSUE                 ,ZAPATA                    ,RONI                      
+901420411,203010,1,20300204,00000,FERNANDO ANTONIO              ,CASTRO                    ,FLORES                    
+901420447,402003,1,20300204,00000,ROLY                          ,VEGA                      ,HERRERA                   
+901420477,101007,2,20300204,00000,ENMA KARINA                   ,VILLEGAS                  ,MEDRANO                   
+901420484,306001,1,20300204,00000,CARLOS JAVIER                 ,VARELA                    ,JARA                      
+901420552,301002,1,20300204,00000,ANDY MANUEL                   ,RIVERA                    ,CARDENAS                  
