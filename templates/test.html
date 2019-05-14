@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block content%}
+
+  {% if padrones %}
+
+    <div class="d-flex ">
+      <div class="flex-column w-100 ">
+        <div class="flex-row">
+          <table class="table table-hover">
+             <caption>Padron electoral</caption>
+          <thead class="thead-dark">
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Cedula</th>
+              <th scope="col">Nombre</th>
+              <th scope="col">Apellidos</th>
+              <th scope="col">Sexo</th>
+              <th scope="col">Codigo Electoral</th>
+              <th scope="col">Junta</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for padron in padrones %}
+            <tr>
+              <th scope="row"></th>
+              <td>{{padron.cedula}}</td>
+              <td>{{padron.nombre}}</td>
+              <td>{{padron.apellido1}} {{padron.apellido2}}</td>
+              <td>{{padron.sexo}}</td>
+              <td><input type="button" class="info-view btn btn-outline-success" value="{{padron.codele}}"></td>
+              <td>{{padron.junta}}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        </div>
+
+        <div class="d-flex flex-row justify-content-center">
+          <nav aria-label="...">
+            <ul class="pagination">
+              <li class="page-item ">
+                {% if padrones.has_previous %}
+                 <div class="d-flex justify-content-center">
+                    <a class="page-link" href="?page=1">&laquo; first</a>
+                    <a class="page-link" href="?page={{ padrones.previous_page_number }}">previous</a>
+                 </div>
+                {% endif %}
+              </li>
+              <li class="page-item ">
+                   <a class="page-link" >&laquo; {{ padrones.number }} / {{ padrones.paginator.num_pages }}</a>
+              </li>
+              <li class="page-item ">
+                {% if padrones.has_next %}
+                 <div class="d-flex justify-content-center">
+                    <a class="page-link" href="?page={{ padrones.next_page_number }}">next</a>
+                    <a class="page-link" href="?page={{ padrones.paginator.num_pages }}">last &raquo;</a>
+                 </div>
+                {% endif %}
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  {% else %}
+              <h1>No records found!</h1>
+  {% endif %}
+
+
+
+{% endblock %}
+
