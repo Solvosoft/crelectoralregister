@@ -1,0 +1,38 @@
+{% extends 'navbar.html' %}
+{% block content %}
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+<h5>Padrón electoral por persona</h5>
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Cédula</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Primer apellido</th>
+            <th scope="col">Segundo apellido</th>
+            <th scope="col">Sexo</th>
+            <th scope="col">Codelec</th>
+            <th scope="col">Fecha de caducidad</th>
+            <th scope="col">Junta</th>
+
+        </tr>
+    </thead>
+    <tbody>
+    {% for d in dataByCedula %}
+        <tr>
+            <td>{{ d.cedula }}</td>
+            <td>{{ d.nombre }}</td>
+            <td>{{ d.primer_apellido }}</td>
+            <td>{{ d.segundo_apellido }}</td>
+            <td>{{ d.sexo }}</td>
+            <td>{{ d.codelec }}</td>
+            <td>{{ d.fecha_caducidad }}</td>
+            <td>{{ d.junta }}</td>
+        </tr>
+    {% endfor %}
+
+    </tbody>
+</table>
+
+{% endblock %}

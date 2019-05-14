@@ -1,12 +1,8 @@
-{% block content %}
-<!DOCTYPE html>
-<html>
-<head>
-<title>Padron electoral</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-</head>
-<body>
+{% extends 'navbar.html' %}
 
+{% block content %}
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <h5>Padrón electoral completo</h5>
     <table class="table">
         <thead class="thead-dark">
@@ -14,7 +10,7 @@
                 <th scope="col">Cédula</th>
                 <th scope="col">Nombre</th>
                 <th scope="col">Primer apellido</th>
-                <th scope="col">Primer apellido</th>
+                <th scope="col">Segundo apellido</th>
                 <th scope="col">Sexo</th>
                 <th scope="col">Codelec</th>
                 <th scope="col">Fecha de caducidad</th>
@@ -39,7 +35,10 @@
         </tbody>
     </table>
 
-</body>
-</html>
+    <div>
+        <div class="row">
+            <div class="pagination"></div>
+        </div>
+    </div>
 
 {% endblock %}
