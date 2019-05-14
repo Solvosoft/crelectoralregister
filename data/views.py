@@ -5,6 +5,10 @@ from data.models import Padron_electoral
 from django.db.models import Count
 # Create your views here.
 
+#cargar los datos
+
+
+
 def getAllData(request):
     """file = open(os.path.join(BASE_DIR, 'PADRON_COMPLETO.txt'))
     file1 = open("PADRON_COMPLETO.txt", encoding="latin-1")
