@@ -1,70 +1,84 @@
-{% extends 'base.html' %}
-{% block content%}
+{% extends 'importcrdata/base.html' %}
+{% load staticfiles %}
+{% block content %}
 
-  {% if padrones %}
+    {% if padron_paged %}
 
-    <div class="d-flex ">
-      <div class="flex-column w-100 ">
-        <div class="flex-row">
-          <table class="table table-hover">
-             <caption>Padron electoral</caption>
-          <thead class="thead-dark">
-            <tr>
-              <th scope="col"></th>
-              <th scope="col">#</th>
-              <th scope="col">Cedula</th>
-              <th scope="col">Nombre</th>
-              <th scope="col">Sexo</th>
-              <th scope="col">Codigo Electoral</th>
-              <th scope="col">Junta</th>
-            </tr>
-          </thead>
-          <tbody>
-          {% for padron in padrones %}
-            <tr>
-              <th scope="row"></th>
-              <td>{{padron.id}}</td>
-              <td>{{padron.cedula}}</td>
-              <td>{{padron.nombre_completo}}</td>
-              <td>{{padron.sexo}}</td>
-              <td><input type="button" class="info-view btn btn-outline-success" value="{{padron.codele}}"></td>
-              <td>{{padron.junta}}</td>
-            </tr>
-          {% endfor %}
-          </tbody>
-        </table>
+        <div class="d-flex ">
+            <div class="flex-column w-100 ">
+                <div class="flex-row">
+                    <table class="table table-hover">
+                        <caption>Padron electoral</caption>
+                        <thead class="thead-dark">
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col">#</th>
+                            <th scope="col">Cedula</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Sexo</th>
+                            <th scope="col">Codigo Electoral</th>
+                            <th scope="col">Junta</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for padron in padron_paged %}
+                            <tr>
+                                <th scope="row"></th>
+
+
+                                <td>{{ padron.id }}</td>
+                                <td><a href="{{ padron.cedula }}"><input type="button"
+                                                                     class="info-view btn btn-outline-success"
+                                                                     value="{{ padron.cedula }}"></a></td>
+                                <td>{{ padron.nombre_completo }}</td>
+                                <td>{{ padron.sexo }}</td>
+                                <td>{{ padron.codele }}</td>
+                                <td>{{ padron.junta }}</td>
+
+                            </tr>
+
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex flex-row justify-content-center">
+                    <nav aria-label="...">
+                        <ul class="pagination">
+                            <li class="page-item ">
+                                {% if padron_paged.has_previous %}
+                                    <div class="d-flex justify-content-center">
+                                        <a class="page-link"
+                                           href="?page=1 {% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">&laquo;
+                                            first</a>
+                                        <a class="page-link"
+                                           href="?page={{ padron_paged.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">previous</a>
+                                    </div>
+                                {% endif %}
+                            </li>
+                            <li class="page-item ">
+                                <a class="page-link">&laquo; {{ padron_paged.number }}
+                                    / {{ padron_paged.paginator.num_pages }}</a>
+                            </li>
+                            <li class="page-item ">
+                                {% if padron_paged.has_next %}
+                                    <div class="d-flex justify-content-center">
+                                        <a class="page-link"
+                                           href="?page={{ padron_paged.next_page_number }} {% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">next</a>
+                                        <a class="page-link"
+                                           href="?page={{ padron_paged.paginator.num_pages }} {% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">last
+                                            &raquo;</a>
+                                    </div>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
         </div>
-
-        <div class="d-flex flex-row justify-content-center">
-          <nav aria-label="...">
-            <ul class="pagination">
-              <li class="page-item ">
-                {% if padrones.has_previous %}
-                 <div class="d-flex justify-content-center">
-                    <a class="page-link" href="?page=1">&laquo; first</a>
-                    <a class="page-link" href="?page={{ padrones.previous_page_number }}">previous</a>
-                 </div>
-                {% endif %}
-              </li>
-              <li class="page-item ">
-                   <a class="page-link" >&laquo; {{ padrones.number }} / {{ padrones.paginator.num_pages }}</a>
-              </li>
-              <li class="page-item ">
-                {% if padrones.has_next %}
-                 <div class="d-flex justify-content-center">
-                    <a class="page-link" href="?page={{ padrones.next_page_number }}">next</a>
-                    <a class="page-link" href="?page={{ padrones.paginator.num_pages }}">last &raquo;</a>
-                 </div>
-                {% endif %}
-              </li>
-            </ul>
-          </nav>
-        </div>
-      </div>
-    </div>
-  {% else %}
-              <h1>No records found!</h1>
-  {% endif %}
+    {% else %}
+        <h1>No records found!</h1>
+    {% endif %}
 
 
 

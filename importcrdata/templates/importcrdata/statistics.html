@@ -1,10 +1,144 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'importcrdata/base.html' %}
+{% load staticfiles %}
+{% block content %}
+    <h2>Estadísticas</h2>
+
+    <p>Cantidad de personas empadronadas: {{ total_of_people }} personas</p>
+    <p>Cantidad de mujeres en el padron: {{ total_of_women }}</p>
+    <p>Cantidad de hombres en el padron: {{ total_of_men }}</p>
+    <hr>
+
+    <p>Personas cuyo codele vence igual que el presidente: {{ total_of_expirations }}</p>
+    {% for expiration in expiration_list %}
+        <p> {{ expiration.nombre_completo }}</p>
+    {% endfor %}
+
+    <div class="d-flex flex-row justify-content-center">
+        <nav aria-label="...">
+            <ul class="pagination">
+                <li class="page-item ">
+                    {% if expiration_list.has_previous %}
+                        <div class="d-flex justify-content-center">
+                            <a class="page-link"
+                               href="?page=1 {% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">&laquo;
+                                first</a>
+                            <a class="page-link"
+                               href="?page={{ expiration_list.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">previous</a>
+                        </div>
+                    {% endif %}
+                </li>
+                <li class="page-item ">
+                    <a class="page-link">&laquo; {{ expiration_list.number }}
+                        / {{ expiration_list.paginator.num_pages }}</a>
+                </li>
+                <li class="page-item ">
+                    {% if expiration_list.has_next %}
+                        <div class="d-flex justify-content-center">
+                            <a class="page-link"
+                               href="?page={{ expiration_list.next_page_number }} {% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">next</a>
+                            <a class="page-link"
+                               href="?page={{ expiration_list.paginator.num_pages }} {% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">last&raquo;</a>
+                        </div>
+                    {% endif %}
+                </li>
+            </ul>
+        </nav>
+
+
+    </div>
+    <hr>
+
+    <h2>Filtrar votantes por regiones:</h2>
+    <div class="row">
+        <div class="col-4">
+            <select class="form-control" id="province">
+                <option>Elige una provincia</option>
+                {% for province in province_data %}
+                    <option value="{{ province.provincia }}">{{ province.provincia }}</option>
+                {% endfor %}
+            </select>
+
+            <div id="province_stats">
+            </div>
+        </div>
+
+        <div class="col-4">
+            <select class="form-control" id="canton">
+                <option>Elige un canton</option>
+                {% for canton in canton_data %}
+                    <option value="{{ canton.provincia }}-{{canton.canton }}">{{ canton.canton }}</option>
+                {% endfor %}
+            </select>
+
+            <div id="canton_stats">
+            </div>
+        </div>
+
+        <div class="col-4">
+            <select class="form-control" id="district">
+                <option>Elige un distrito</option>
+                {% for district in district_data %}
+                    <option value="{{ district.provincia }}-{{ district.canton }}-{{ district.distrito }}">{{ district.distrito }}, ({{ district.canton }})</option>
+                {% endfor %}
+            </select>
+
+            <div id="district_stats">
+            </div>
+        </div>
+
+    </div>
+
+
+{% endblock %}
+
+{% block js_scripts %}
+    <script>
+        $('#province').change(function () {
+            var province_id = $(this).val();
+            $.ajax(
+                {
+                    type: "GET",
+                    url: "estadisticas/provincia_ajax/",
+                    data: {
+                        province_id: province_id
+                    },
+                    success: function (data) {
+                        let html = '<ul class="mt-2"> <li>' + 'Mujeres: ' + data.number_of_women + '</li> <li>' + 'Hombres: ' + data.number_of_men + '</li> <li>' + 'Total: ' + data.province_people + '</li></ul>'
+                        $('#province_stats').html(html)
+                    }
+                })
+        });
+
+        $('#canton').change(function () {
+            var canton_id = $(this).val();
+            $.ajax(
+                {
+                    type: "GET",
+                    url: "estadisticas/canton_ajax/",
+                    data: {
+                        canton_id: canton_id,
+                    },
+                    success: function (data) {
+                        let html = '<ul class="mt-2"> <li>' + 'Mujeres: ' + data.number_of_women + '</li> <li>' + 'Hombres: ' + data.number_of_men + '</li> <li>' + 'Total: ' + data.province_people + '</li></ul>'
+                        $('#canton_stats').html(html)
+                    }
+                })
+        });
+
+        $('#district').change(function () {
+            var district_id = $(this).val();
+            $.ajax(
+                {
+                    type: "GET",
+                    url: "estadisticas/distrito_ajax/",
+                    data: {
+                        district_id: district_id
+                    },
+                    success: function (data) {
+                        let html = '<ul class="mt-2"> <li>' + 'Mujeres: ' + data.number_of_women + '</li> <li>' + 'Hombres: ' + data.number_of_men + '</li> <li>' + 'Total: ' + data.province_people + '</li></ul>'
+                        $('#district_stats').html(html)
+                    }
+                })
+        });
+    </script>
+{% endblock %}

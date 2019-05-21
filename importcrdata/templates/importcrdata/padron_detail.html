@@ -1,10 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'importcrdata/base.html' %}
+{% load staticfiles %}
+{% block content %}
+
+    <a href="{% url 'importcrdata:index' %}">
+        <button class="btn btn-danger">Regresar</button>
+    </a>
+
+    <div class="jumbotron mt-2">
+        <h1>PERFIL DEL VOTANTE</h1>
+        <p>CEDULA: {{ padron_detail.cedula }}</p>
+        <p>NOMBRE: {{ padron_detail.nombre_completo }}</p>
+        <p>CODIGO ELECTORAL: {{ padron_detail.codele }}</p>
+        <p>SEXO: {% if padron_detail.sexo == 1 %}
+            MASCULINO
+        {% else %}
+            FEMENINO
+        {% endif %}</p>
+        <p>CADUCE: {{ padron_detail.fechacaduc }}</p>
+        <h2>Detalles adicionales:</h2>
+        <p>Cantidad de votantes con nombre igual: {{ same_name }} personas.</p>
+        <p>Cantidad de votantes con este codigo electoral:</p>
+        <ul>
+            <li>Mujeres: {{ number_of_women }} </li>
+            <li>Hombres: {{ number_of_men }}</li>
+        </ul>
+    </div>
+
+{% endblock %}

@@ -1,10 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'importcrdata/base.html' %}
+
+{% load staticfiles %}
+{% block content %}
+
+    <h3>Agregar nuevo ciudadano</h3>
+    <p>Por favor complete la siguiente informacion: </p>
+
+    <div class="row">
+        <div class="col-6">
+            <form action="" method="POST">
+                {% csrf_token %}
+                {{ form.codele }}
+                {{ form.cedula }}
+                {{ form.nombre_completo }}
+                {{ form.sexo }}
+                {{ form.junta }}
+                {{ form.fechacaduc }}
+                <button class="btn btn-primary" type="submit">Save</button>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

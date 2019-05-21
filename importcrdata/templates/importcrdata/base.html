@@ -1,105 +1,88 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
-{% load static %}
+{% load staticfiles %}
 <head>
     <meta charset="UTF-8">
     <title>Prototipo -- {% block title %} TSE-Viewer {% endblock %} </title>
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}" >
-
-
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+          integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
 </head>
 
 <body>
 
 <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow mb-5">
-  <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="/test/"> TSE-Viewer </a>
-  <ul class="navbar-nav px-3">
-    <li class="nav-item text-nowrap">
-      <a class="nav-link" href="#">Sign out</a>
-    </li>
-  </ul>
+    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="/es/"> TSE-Viewer </a>
+    <ul class="navbar-nav px-3">
+        <li class="nav-item text-nowrap">
+            <a class="nav-link" href="#">Sign out</a>
+        </li>
+    </ul>
 </nav>
 
 <div class="container-fluid mt-5">
-  <div class="row">
-    <nav class="col-md-2 d-none d-md-block bg-light sidebar">
-      <div class="sidebar-sticky">
-        <ul class="nav flex-column">
-          <li class="nav-item">
-            <a class="nav-link active" href="#">
-              <span data-feather="home"></span>
-              Padron Viewer <span class="sr-only">(current)</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" >
-              <span data-feather="layers"></span>
-              Integrations
-            </a>
-          </li>
-        </ul>
+    <div class="row">
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+            <div class="sidebar-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'importcrdata:index' %}">
+                            <span data-feather="home"></span>
+                            Padrón Electoral<span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'importcrdata:estadisticas' %}">
+                            <span data-feather="home"></span>
+                            Estadísticas<span class="sr-only">(current)</span>
+                        </a>
+                    </li>
 
-        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-          <span>Saved reports</span>
-          <a class="d-flex align-items-center text-muted" href="#">
-            <span data-feather="plus-circle"></span>
-          </a>
-        </h6>
-        <ul class="nav flex-column mb-2">
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span data-feather="file-text"></span>
-              Year-end sale
-            </a>
-          </li>
-        </ul>
-      </div>
-    </nav>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'importcrdata:agregar-persona' %}">
+                            <span data-feather="home"></span>
+                            Agregar persona<span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
 
-    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
-      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h2 class="h2">Padron Electoral</h2>
-        <div class="btn-toolbar mb-2 mb-md-0">
-              <div class="input-group mr-2">
-                  <form method="POST">
-                    <div class="d-flex flex-row justify-content-right">
-                        {{searchForm}}
-                        {% csrf_token %}
-                       <div class="input-group-append">
-                          <button type="submit" class="btn btn-sm btn-outline-secondary">Buscar</button>
-                       </div>
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h2 class="h2">Padron Electoral</h2>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="input-group mr-2">
+                        <form method='GET' action="">
+                            <div class="d-flex flex-row justify-content-right">
+                                <input class="" type="text" placeholder="" name="q"
+                                       value='{{ request.GET.q }}'>
+                                <input type="submit" class="btn btn-sm btn-outline-secondary" value="Buscar">
+                            </div>
+                        </form>
                     </div>
+                </div>
+            </div>
 
-                  </form>
-              </div>
-        </div>
-      </div>
+            <div class="container">
 
-      <div class="container">
+                {% block content %}
 
-        {% block content%}
+                {% endblock %}
 
-        {% endblock %}
+            </div>
 
-      </div>
-
-    </main>
-  </div>
+        </main>
+    </div>
 </div>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-<script>
-  $(".info-view").click(function(){
-    console.log($(this).val())
-    $.get("http://localhost:8000/test/",{"option":'info',"codele":$(this).val()}, function(data){
+    {% block js_scripts %}
+    {% endblock %}
 
-    });
-  });
-
-  </script>
 
 </body>
 </html>
