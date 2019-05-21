@@ -15,8 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from importcrdata.views import getTseData
+
 urlpatterns = [
-    path('test/', include('importcrdata.urls')),
+    path('es/', include('importcrdata.urls')),
     path('admin/', admin.site.urls),
 ]
