@@ -10,23 +10,22 @@
              <caption>Padron electoral</caption>
           <thead class="thead-dark">
             <tr>
+              <th scope="col"></th>
               <th scope="col">#</th>
               <th scope="col">Cedula</th>
               <th scope="col">Nombre</th>
-              <th scope="col">Apellidos</th>
               <th scope="col">Sexo</th>
               <th scope="col">Codigo Electoral</th>
               <th scope="col">Junta</th>
-              <th scope="col"></th>
             </tr>
           </thead>
           <tbody>
           {% for padron in padrones %}
             <tr>
               <th scope="row"></th>
+              <td>{{padron.id}}</td>
               <td>{{padron.cedula}}</td>
-              <td>{{padron.nombre}}</td>
-              <td>{{padron.apellido1}} {{padron.apellido2}}</td>
+              <td>{{padron.nombre_completo}}</td>
               <td>{{padron.sexo}}</td>
               <td><input type="button" class="info-view btn btn-outline-success" value="{{padron.codele}}"></td>
               <td>{{padron.junta}}</td>
