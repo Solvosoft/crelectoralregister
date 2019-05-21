@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<div class="flex-column d-flex" >
+    <div class="flex-row d-flex justify-content-end" >
+
+        {{form}}
+        <input id="search_btn" type="submit" value="Add">
+    </div>
+
+    <div id='alt' class="m-auto alert alert-danger " role="alert">
+      A simple danger alert—check it out!
+    </div>
+
+</div>
+
+    {% if elector_data != None %}
+        <div class="d-flex justify-content-left" >
+            <div class="d-flex flex-row justify-content-center">
+                <div class="flex-column">
+                    <div class="flex-row">
+                        <table class="table table-borderless">
+                            <thead class="thead-ligth">
+                                <tr>
+                                    <th scope="col"><h2>Perfil</h2></th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                  <th scope="row">Cedula</th>
+                                  <td>{{elector_data.cedula}}</td>
+                                </tr>
+                                <tr>
+                                  <th scope="row">Nombre</th>
+                                  <td>{{elector_data.nombre}} {{ elector_data.apellido1 }} {{ elector_data.apellido2 }}</td>
+                                </tr>
+                                <tr>
+                                  <th scope="row">Sexo</th>
+                                  {% if elector_data.sexo == 1 %}
+                                    <td>Hombre</td>
+                                      {% else %}
+                                      <td>Mujer</td>
+                                      {% endif %}
+                                </tr>
+                                <tr>
+                                  <th scope="row">Fecha Vencimiento</th>
+                                  <td>{{elector_data.fechacaduc}}</td>
+                                </tr>
+                                <tr>
+                                  <th scope="row">Fecha Vencimiento</th>
+                                  <td>{{elector_data.fechacaduc}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            <div class="flex-column">
+                <div class="flex-row">
+                        <table class="table table-borderless">
+                            <thead class="thead-ligth">
+                                <tr>
+                                    <th scope="col"><h2>Locación Electoral</h2></th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                  <th scope="row">Dirección</th>
+                                  <td>{{distelec_info.distrito}} ,{{distelec_info.canton}} ,{{distelec_info.provincia}}</td>
+                                </tr>
+                                <tr>
+                                  <th scope="row">Cantidad de Votantes masculinos</th>
+                                  <td>{{voters.male}}</td>
+                                </tr>
+                                <tr>
+                                  <th scope="row">Cantidad de Votantes femeninos</th>
+                                  <td>{{voters.female}}</td>
+                                </tr>
+                                <tr>
+                                  <th scope="row">Total de Votantes con el mismo nombre</th>
+                                  <td>{{voters_same_name.same_name}}</td>
+                                </tr>
+                                <tr>
+                                  <th scope="row">Total de Votatnes</th>
+                                  <td>{{voters.total}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+            </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="flex-column d-flex" >
+            <div id='alt' class="m-auto alert alert-danger " role="alert">
+              No data fetch please, fill with another cedula.
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}
+
+{% block js %}
+<script>
+    $('#alt').hide();
+    $("#search_btn").click(function(){
+        if ($('#id_search_name').val().length == 9){
+
+            $('#alt').hide();
+            location.href = '/test/' + $('#id_search_name').val()
+        }else{
+            $('#alt').show();
+        }
+    });
+  </script>
+{% endblock js %}

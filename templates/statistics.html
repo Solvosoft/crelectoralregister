@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+        {% if form %}
+            {{ form.canton }}
+        {% endif %}
+        {{pform}}
+            <input type="submit" value="Send request">
+
+        <div class="d-flex justify-content-left" >
+            <div class="d-flex flex-row justify-content-center">
+                <div class="flex-column">
+                    <div class="flex-row">
+                        <table class="table table-borderless">
+                            <thead class="thead-ligth">
+                                <tr>
+                                    <th scope="col"><h2>Estadisticas</h2></th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                  <th scope="row">Fecha Caducidad Cedula con Presidente</th>
+                                  <td>{{caduc_voters}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+        </div>
+        </div>
+
+
+{% endblock %}
+
+{% block js %}
+<script>
+
+     $("#id_province").change(function(resp){
+         console.log($(this).val());
+        $.get("http://localhost:8000/test/statistics",{"option":'province',"province_id":$(this).val().substr(0,1)}, function(data){
+        });
+
+    });
+
+  </script>
+{% endblock js %}

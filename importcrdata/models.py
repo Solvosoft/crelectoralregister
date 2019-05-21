@@ -3,10 +3,18 @@ from django.db import models
 
 
 # Create your models here.
+class Distelec(models.Model):
+    codelec = models.CharField(max_length=6, primary_key=True)
+    provincia = models.CharField(max_length=26)
+    canton = models.CharField(max_length=26)
+    distrito = models.CharField(max_length=26)
 
-class PatronElectoral(models.Model):
-    cedula = models.CharField(max_length=9)
-    codele = models.CharField(max_length=6)
+    def __str__(self):
+        return "%s " % self.provincia
+
+class PadronElectoral(models.Model):
+    cedula = models.CharField(max_length=9,primary_key=True)
+    codelec = models.ForeignKey(Distelec, on_delete=models.CASCADE)
     sexo = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(2)])
     fechacaduc = models.CharField(max_length=8)
     junta = models.CharField(max_length=5)
@@ -15,8 +23,12 @@ class PatronElectoral(models.Model):
     apellido2 = models.CharField(max_length=26)
 
 
-class Distelec(models.Model):
-    codele = models.CharField(max_length=6)
-    provincia = models.CharField(max_length=26)
-    canton = models.CharField(max_length=26)
-    distrito = models.CharField(max_length=26)
+
+
+
+
+
+
+
+
+
