@@ -1,127 +1,217 @@
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.shortcuts import render
-from django.http import HttpResponse
-from tse_demo.settings import BASE_DIR
-import os
-from importcrdata.models import PatronElectoral,Distelec
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.shortcuts import render, get_object_or_404, redirect
+from importcrdata.decorators import validRequest
+from django.views.generic import View, ListView, DetailView, CreateView
+from django.core import serializers
+from django.http import HttpResponse, JsonResponse
+
+from importcrdata.models import PadronElectoral, Distelec
 from . import forms
-import re
-# Create your views here.
-import logging
-import queue
-import threading
-
-import time
 
 
-def typeValidator(data,fn):
-    try:
-        result = fn(data)
-        return result
-    except:
-        return 'error'
+class PadronView(ListView):
+    template_name = 'importcrdata/index.html'
 
-def tsePaginator(search_name,type,page):
-    if type == 'int':
-        if len(search_name) == 6: #i
-            temp_data = PatronElectoral.objects.filter(codele__icontains=str(search_name))
+    def get(self, request):
 
-            if len(temp_data) == 0:
-                temp_data = PatronElectoral.objects.filter(cedula__icontains=str(search_name))
-            temp_page = page
-            temp_paginator = Paginator(temp_data, 5)
+        form = forms.SearchForm()
+        q = request.GET.get('q')
+
+        if not q:
+            padron_list = PadronElectoral.objects.all()
         else:
-            temp_data = PatronElectoral.objects.filter(cedula__icontains=str(search_name))
-            temp_page = page
-            temp_paginator = Paginator(temp_data,5)
+            searchType = self.getSearchType(q)
+            if searchType:
+                padron_list = self.filterBasedInNumberSearch(q)
+            else:
+                padron_list = PadronElectoral.objects.filter(nombre_completo__icontains=str(q))
 
+        padron_paged = getListPaged(self, request, padron_list, 7)
+
+        context = {'padron_paged': padron_paged, 'searchForm': form}
+        return render(request, self.template_name, context)
+
+    def getSearchType(self, search):
         try:
-            temp_datas = temp_paginator.page(temp_page)
-        except PageNotAnInteger:
-            temp_datas = temp_paginator.page(1)
-        except EmptyPage:
-            temp_datas = temp_paginator.page(temp_paginator.num_pages)
-        return temp_datas
-    elif type == 'str':
-        temp_data = PatronElectoral.objects.filter(nombre__icontains=str(search_name))
-        temp_data2 = PatronElectoral.objects.filter(apellido1__icontains = str(search_name))
-        temp_data3 = PatronElectoral.objects.filter(apellido2__icontains=str(search_name))
-        temp_page = page
-        whole_data = temp_data | temp_data2 | temp_data3
-        temp_paginator = Paginator(whole_data, 5)
+            int(search)
+            return True
+        except ValueError:
+            return False
 
-        try:
-            temp_datas = temp_paginator.page(temp_page)
-        except PageNotAnInteger:
-            temp_datas = temp_paginator.page(1)
-        except EmptyPage:
-            temp_datas = temp_paginator.page(temp_paginator.num_pages)
-        return temp_datas
-    elif type == 'init':
-        temp_data = PatronElectoral.objects.all()
-        temp_page = page
-        temp_paginator = Paginator(temp_data, 5)
+    def filterBasedInNumberSearch(self, search):
+        if len(search) == 6:
+            return PadronElectoral.objects.filter(codele__iexact=str(search))
+        else:
+            return PadronElectoral.objects.filter(cedula__icontains=str(search))
 
-        try:
-            temp_datas = temp_paginator.page(temp_page)
-        except PageNotAnInteger:
-            temp_datas = temp_paginator.page(1)
-        except EmptyPage:
-            temp_datas = temp_paginator.page(temp_paginator.num_pages)
-        return temp_datas
+class StatisticsView(View):
+    template_name = 'importcrdata/statistics.html'
+    presidents_id = '110600078'
 
+    def get(self, request):
 
+        province_data = Distelec.objects.values('provincia').distinct()
+        canton_data = Distelec.objects.values('provincia','canton').distinct()
+        district_data = Distelec.objects.values('provincia','canton','distrito').distinct()
 
-def getTseData(request):
-    form = forms.SearchForm()
+        self.total_of_people = PadronElectoral.objects.all().count()
+        total_of_women = PadronElectoral.objects.filter(sexo=2).count()
+        total_of_men = PadronElectoral.objects.filter(sexo=1).count()
 
-    if request.method == 'POST':
-        form = forms.SearchForm(request.POST)
+        expiration_date_list = self.getPeopleInExpirationDate(self.presidents_id)
+        expiration_list = getListPaged(self, request, expiration_date_list, 4)
+
+        context = {'expiration_list': expiration_list,
+                   'total_of_people': self.total_of_people,
+                   'total_of_women': total_of_women,
+                   'total_of_men': total_of_men,
+                   'total_of_expirations': expiration_date_list.count(),
+                   'province_data': province_data,
+                   'canton_data':canton_data,
+                   'district_data':district_data
+                   }
+
+        return render(request, self.template_name, context)
+
+    def getPeopleInExpirationDate(self, id):
+        date_param = PadronElectoral.objects.get(cedula__iexact=id)
+        return PadronElectoral.objects.filter(fechacaduc__iexact=date_param.fechacaduc)
+
+class PersonCreateView(ListView):
+    template_name = 'importcrdata/add_person.html'
+
+    def get(self, request):
+        form = forms.PadronForm()
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request):
+        form = forms.PadronForm(request.POST)
         if form.is_valid():
-            if form.cleaned_data['search_name'] != '':
-                if typeValidator(form.cleaned_data['search_name'], int) != 'error':
-                    padrones = tsePaginator(form.cleaned_data['search_name'], 'int', request.GET.get('page', 1))
+            form.save()
+        context = {'form': form}
 
-                elif typeValidator(form.cleaned_data['search_name'], str) != 'error':
-                    padrones = tsePaginator(form.cleaned_data['search_name'], 'str', request.GET.get('page', 1))
+        return redirect('importcrdata:index')
 
-        return render(request, 'test.html', {'padrones': padrones, 'searchForm': form})
+class ProvinciaAjaxView(ListView):
 
-    padrones = tsePaginator('', 'init', request.GET.get('page', 1))
+    def get(self, request):
 
-    return render(request, 'test.html', {"padrones": padrones, 'searchForm': form})
-my_queue = queue.Queue()
-def storeInQueue(f):
+        province_id = request.GET['province_id']
+        province_data = Distelec.objects.filter(provincia__iexact=province_id).values('codele')
+        province_identifier = province_data[0]['codele'][0]
 
-    def wrapper(*args):
-        my_queue.put(f(*args))
-    return wrapper
+        number_of_women = PadronElectoral.objects.filter(codele__startswith=province_identifier, sexo=2).count()
+        number_of_men = PadronElectoral.objects.filter(codele__startswith=province_identifier, sexo=1).count()
+        province_people = number_of_women + number_of_men
 
-@storeInQueue
-def loadDataToBd():
+        return JsonResponse({'province_people': province_people, 'number_of_women': number_of_women, 'number_of_men': number_of_men})
 
-       file1 = open("PADRON_COMPLETO.txt", encoding="latin-1")
-       lines = []
-       x=0
-       then = time.time()
-       for line in file1:
-           newLine = re.sub(' +|\n', ' ', line)
-           newLine = newLine.split(',')
-           newLine[-1] = newLine[-1].split(' ')[0]
-           lines.append(newLine)
-           PatronElectoral.objects.create(cedula=newLine[0], codele=newLine[1], sexo=newLine[2], fechacaduc=newLine[3], junta=newLine[4], nombre=newLine[5], apellido1=newLine[6], apellido2=newLine[7])
-           x = x + 1.
+class CantonAjaxView(ListView):
 
-       now = time.time()
+    def get(self, request):
 
-       print("It took: ", now-then, " seconds")
+        canton_id = request.GET['canton_id']
+        ids_container = canton_id.split('-')
+        provincia = ids_container[0]
+        canton = ids_container[1]
 
-def loadDataView(request):
-    x = threading.Thread(target=loadDataToBd)
-    x.start()
-    my_queue = queue.Queue()
-    my_data = my_queue.get()
-
-    return render(request, 'test.html', context = {'data': my_data})
+        canton_data = Distelec.objects.filter(provincia__iexact=provincia, canton__iexact=canton).values('codele')
+        canton_identifier = "".join([canton_data[0]['codele'][0], canton_data[0]['codele'][1], canton_data[0]['codele'][2]])
 
 
+        number_of_women = PadronElectoral.objects.filter(codele__startswith=canton_identifier, sexo=2).count()
+        number_of_men = PadronElectoral.objects.filter(codele__startswith=canton_identifier, sexo=1).count()
+        province_people = number_of_women + number_of_men
+
+        return JsonResponse({'province_people': province_people, 'number_of_women': number_of_women, 'number_of_men': number_of_men})
+
+class DistritoAjaxView(ListView):
+
+    def get(self, request):
+
+        district_id = request.GET['district_id']
+        ids_container = district_id.split('-')
+
+        provincia = ids_container[0]
+        canton = ids_container[1]
+        distrito = ids_container[2]
+
+        district_data = Distelec.objects.filter(provincia__iexact=provincia, canton__iexact=canton, distrito__iexact=distrito).values('codele')
+        district_identifier = "".join([district_data[0]['codele'][0], district_data[0]['codele'][1], district_data[0]['codele'][2], district_data[0]['codele'][3], district_data[0]['codele'][4], district_data[0]['codele'][5]])
+
+        number_of_women = PadronElectoral.objects.filter(codele__startswith=district_identifier, sexo=2).count()
+        number_of_men = PadronElectoral.objects.filter(codele__startswith=district_identifier, sexo=1).count()
+        province_people = number_of_women + number_of_men
+
+        return JsonResponse({'province_people': province_people, 'number_of_women': number_of_women, 'number_of_men': number_of_men})
+
+class PadronDetailView(DetailView):
+    template_name = 'importcrdata/padron_detail.html'
+    context_object_name = 'padron_detail'
+
+    current_codele = ''
+    full_name = ''
+
+    def get_object(self):
+
+        data = get_object_or_404(PadronElectoral, cedula=self.kwargs.get('cedula'))
+        self.current_codele = data.codele
+        self.full_name = data.nombre_completo
+        return data
+
+    def get_context_data(self, **kwargs):
+
+        tempData = PadronElectoral.objects.filter(codele__iexact=str(self.current_codele))
+
+        same_name = self.getPeopleWithSameName(self.full_name)
+        number_of_women = tempData.filter(sexo=2)
+        number_of_men = tempData.filter(sexo=1)
+
+        return {'padron_detail': self.get_object(),
+                'same_name': same_name,
+                'number_of_women': len(number_of_women),
+                'number_of_men': len(number_of_men)}
+
+    def getPeopleWithSameName(self, name):
+
+        tempData = PadronElectoral.objects.all()
+        name_array = name.split(' ')
+
+        if len(name_array) == 3:
+            amount_of_people = 0
+            name = name_array[0]
+            tempData_filtered = tempData.filter(nombre_completo__istartswith=name)
+
+            for data in tempData_filtered:
+                current_name = data.nombre_completo.split(' ')
+                if current_name[0] == name and len(current_name) == 3:
+                    amount_of_people += 1
+
+            return amount_of_people - 1
+
+        elif len(name_array) == 4:
+            name = ' '.join([name_array[0], name_array[1]])
+            return len(tempData.filter(nombre_completo__icontains=name)) - 1
+
+        else:
+            name = ' '.join([name_array[0], name_array[1], name_array[2]])
+            return len(tempData.filter(nombre_completo__icontains=name)) - 1
+
+# Method in charge of paginate any list.
+def getListPaged(self, request, list_for_paging, amount_per_page):
+    paginator = Paginator(list_for_paging, amount_per_page)
+    page = request.GET.get("page")
+
+    try:
+        list_paged = paginator.page(page)
+    except PageNotAnInteger:
+        list_paged = paginator.page(1)
+    except EmptyPage:
+        list_paged = paginator.page(paginator.num_pages)
+
+    return list_paged
+
+# METHOD THAT TESTS A CUSTOM DECORATOR
+@validRequest
+def testDecorator(request):
+    return render(request, 'importcrdata/test.html', {"context": 'context'})
