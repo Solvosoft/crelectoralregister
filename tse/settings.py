@@ -81,7 +81,7 @@ WSGI_APPLICATION = 'tse.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'tse',
+        'NAME': 'tseDB',
         'USER': 'tse',
         'PASSWORD': 'tse12345',
         'HOST': 'localhost',

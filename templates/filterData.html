@@ -2,8 +2,6 @@
 {% block content %}
 
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
-<h5>Padrón electoral por persona</h5>
 <table class="table">
     <thead class="thead-dark">
         <tr>
@@ -19,7 +17,7 @@
         </tr>
     </thead>
     <tbody>
-    {% for d in dataByCedula %}
+    {% for d in object_list %}
         <tr>
             <td>{{ d.cedula }}</td>
             <td>{{ d.nombre }}</td>

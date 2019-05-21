@@ -8,33 +8,35 @@
         <table class="table">
             <thead class="thead-dark">
                 <tr>
-                    <th scope="col">Cédula</th>
-                    <th scope="col">Nombre</th>
-                    <th scope="col">Primer apellido</th>
-                    <th scope="col">Segundo apellido</th>
-                    <th scope="col">Sexo</th>
-                    <th scope="col">Codelec</th>
-                    <th scope="col">Fecha de caducidad</th>
-                    <th scope="col">Junta</th>
+                    <th scope="col">Codele</th>
+                    <th scope="col">Provincia</th>
+                    <th scope="col">Cantón</th>
+                    <th scope="col">Distrito</th>
+                    <!--<th scope="col">Acción</th>-->
 
                 </tr>
             </thead>
             <tbody>
             {% for d in object_list %}
                 <tr>
-                    <td>{{ d.cedula }}</td>
-                    <td>{{ d.nombre }}</td>
-                    <td>{{ d.primer_apellido }}</td>
-                    <td>{{ d.segundo_apellido }}</td>
-                    <td>{{ d.sexo }}</td>
-                    <td>{{ d.codelec }}</td>
-                    <td>{{ d.fecha_caducidad }}</td>
-                    <td>{{ d.junta }}</td>
+                    <td id="codele">{{ d.codele }}</td>
+                    <td id="provincia">{{ d.provincia }}</td>
+                    <td id="canton">{{ d.canton }}</td>
+                    <td id="distrito">{{ d.distrito }}</td>
+                    <!--<td><button id="info-btn" type="button" onclick="myFunction()">Ver info</button></td>-->
                 </tr>
             {% endfor %}
 
             </tbody>
         </table>
+
+        <script>
+            document.getElementById("info-btn").onclick = function() {myFunction()};
+            codele = document.getElementById("codele").innerHTML;
+            function myFunction() {
+                alert('La cantidad de votantes son: ' + codele);
+            }
+        </script>
 
         {% if is_paginated %}
             <ul class="pagination">
