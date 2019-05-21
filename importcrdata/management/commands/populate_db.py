@@ -84,6 +84,6 @@ class Command(BaseCommand):
         print("It took: ", now - then, " seconds")
 
     def handle(self, *args, **kwargs):
-        # self.loadDistelect()
+        self.loadDistelect()
         self.loadPadronElectoral()
 
