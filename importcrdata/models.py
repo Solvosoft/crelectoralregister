@@ -5,9 +5,9 @@ from django.db import models
 # Create your models here.
 class Distelec(models.Model):
     codelec = models.CharField(max_length=6, primary_key=True)
-    provincia = models.CharField(max_length=26)
-    canton = models.CharField(max_length=26)
-    distrito = models.CharField(max_length=26)
+    provincia = models.CharField(max_length=100)
+    canton = models.CharField(max_length=100)
+    distrito = models.CharField(max_length=100)
 
     def __str__(self):
         return "%s " % self.provincia
@@ -18,9 +18,9 @@ class PadronElectoral(models.Model):
     sexo = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(2)])
     fechacaduc = models.CharField(max_length=8)
     junta = models.CharField(max_length=5)
-    nombre = models.CharField(max_length=30)
-    apellido1 = models.CharField(max_length=26)
-    apellido2 = models.CharField(max_length=26)
+    nombre = models.CharField(max_length=50)
+    apellido1 = models.CharField(max_length=50)
+    apellido2 = models.CharField(max_length=50)
 
 
 
