@@ -10,8 +10,15 @@ from . import forms
 
 
 class PadronView(ListView):
+    """
+    This is the main view, it contains the index.html file and it's in charge of display
+    the padron electoral data.
+
+    This view works with a param "q" in get requests that will help for filtering data.
+    """
     template_name = 'importcrdata/index.html'
 
+    #by default it goes inside this method and display the data based on "q" param.
     def get(self, request):
 
         form = forms.SearchForm()
@@ -31,6 +38,7 @@ class PadronView(ListView):
         context = {'padron_paged': padron_paged, 'searchForm': form}
         return render(request, self.template_name, context)
 
+    #Helper method that identifies if data is int or not.
     def getSearchType(self, search):
         try:
             int(search)
@@ -38,6 +46,7 @@ class PadronView(ListView):
         except ValueError:
             return False
 
+    #This method is in charge of filter the data only if it is a number.
     def filterBasedInNumberSearch(self, search):
         if len(search) == 6:
             return PadronElectoral.objects.filter(codele__iexact=str(search))
@@ -45,6 +54,9 @@ class PadronView(ListView):
             return PadronElectoral.objects.filter(cedula__icontains=str(search))
 
 class StatisticsView(View):
+    """
+    This view contains all the statistics data, its based on filters.
+    """
     template_name = 'importcrdata/statistics.html'
     presidents_id = '110600078'
 
@@ -78,6 +90,9 @@ class StatisticsView(View):
         return PadronElectoral.objects.filter(fechacaduc__iexact=date_param.fechacaduc)
 
 class PersonCreateView(ListView):
+    """
+    This view is a generic view used for add person to padron electoral.
+    """
     template_name = 'importcrdata/add_person.html'
 
     def get(self, request):
@@ -93,11 +108,14 @@ class PersonCreateView(ListView):
         return redirect('importcrdata:index')
 
 class ProvinciaAjaxView(ListView):
-
+    """
+    This view is in charge of display statistics by Province.
+    """
     def get(self, request):
 
         province_id = request.GET['province_id']
         province_data = Distelec.objects.filter(provincia__iexact=province_id).values('codele')
+        # The digit in position 0 contains the value for the province. That will help to filter
         province_identifier = province_data[0]['codele'][0]
 
         number_of_women = PadronElectoral.objects.filter(codele__startswith=province_identifier, sexo=2).count()
@@ -107,7 +125,9 @@ class ProvinciaAjaxView(ListView):
         return JsonResponse({'province_people': province_people, 'number_of_women': number_of_women, 'number_of_men': number_of_men})
 
 class CantonAjaxView(ListView):
-
+    """
+    This view is in charge of display statistics by Canton.
+    """
     def get(self, request):
 
         canton_id = request.GET['canton_id']
@@ -116,6 +136,7 @@ class CantonAjaxView(ListView):
         canton = ids_container[1]
 
         canton_data = Distelec.objects.filter(provincia__iexact=provincia, canton__iexact=canton).values('codele')
+        #Joins the different codes to get a one who will work as a param to filter.
         canton_identifier = "".join([canton_data[0]['codele'][0], canton_data[0]['codele'][1], canton_data[0]['codele'][2]])
 
 
@@ -126,7 +147,9 @@ class CantonAjaxView(ListView):
         return JsonResponse({'province_people': province_people, 'number_of_women': number_of_women, 'number_of_men': number_of_men})
 
 class DistritoAjaxView(ListView):
-
+    """
+    This view is in charge of display Distrito's statistics.
+    """
     def get(self, request):
 
         district_id = request.GET['district_id']
@@ -137,6 +160,7 @@ class DistritoAjaxView(ListView):
         distrito = ids_container[2]
 
         district_data = Distelec.objects.filter(provincia__iexact=provincia, canton__iexact=canton, distrito__iexact=distrito).values('codele')
+        #Joins the different codes to get a one who will work as a param to filter.
         district_identifier = "".join([district_data[0]['codele'][0], district_data[0]['codele'][1], district_data[0]['codele'][2], district_data[0]['codele'][3], district_data[0]['codele'][4], district_data[0]['codele'][5]])
 
         number_of_women = PadronElectoral.objects.filter(codele__startswith=district_identifier, sexo=2).count()
@@ -146,6 +170,9 @@ class DistritoAjaxView(ListView):
         return JsonResponse({'province_people': province_people, 'number_of_women': number_of_women, 'number_of_men': number_of_men})
 
 class PadronDetailView(DetailView):
+    """
+    This view contains the profile for an specific user.
+    """
     template_name = 'importcrdata/padron_detail.html'
     context_object_name = 'padron_detail'
 
@@ -159,6 +186,7 @@ class PadronDetailView(DetailView):
         self.full_name = data.nombre_completo
         return data
 
+    # Data is filtered based on the codele of the selected person.
     def get_context_data(self, **kwargs):
 
         tempData = PadronElectoral.objects.filter(codele__iexact=str(self.current_codele))
@@ -172,6 +200,8 @@ class PadronDetailView(DetailView):
                 'number_of_women': len(number_of_women),
                 'number_of_men': len(number_of_men)}
 
+    # Method in charge of split the full name, compare it with the rest of people and return
+    # the amount of people with the same name.
     def getPeopleWithSameName(self, name):
 
         tempData = PadronElectoral.objects.all()

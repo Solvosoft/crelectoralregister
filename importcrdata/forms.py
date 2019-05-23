@@ -7,6 +7,10 @@ class SearchForm(forms.Form):
 
 
 class PadronForm(forms.ModelForm):
+    """
+    In this class is the form for add a new person to the Padron Electoral Table.
+    It needs cedula, codele, sexo, fechacaduc, junta and nombre_completo.
+    """
     cedula = forms.CharField(max_length=9, widget=forms.TextInput(
         attrs={
             'class': 'form-control m-2',
