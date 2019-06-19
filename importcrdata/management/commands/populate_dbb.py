@@ -58,20 +58,20 @@ class Command(BaseCommand):
 
 
     def del_dist_registry(self):
-        logger.error('Deleting distelec registry.')
+        logger.info('Deleting distelec registry.')
         Distelec.objects.all().delete()
-        logger.error('Distelec registry completed, ready to continue.')
+        logger.info('Distelec registry completed, ready to continue.')
 
     def del_padron_registry(self):
-        logger.error('Deleting Padron Electoral registry.')
+        logger.info('Deleting Padron Electoral registry.')
         PadronElectoral.objects.all().delete()
-        logger.error('Padron Electoral deleted succesfully, ready to continue.')
+        logger.info('Padron Electoral deleted succesfully, ready to continue.')
 
 
     def in_bd(self,cursor,sql):
         then = time.time()
         cursor.execute(sql)
-        logger.error('100.000 data saved into db.')
+        logger.info('100.000 data saved into db.')
         now = time.time()
         print("It took: ", now - then, " seconds")
 
@@ -79,7 +79,7 @@ class Command(BaseCommand):
         if options[0] == 'distelec':
             self.del_dist_registry()
             with connection.cursor() as cursor:
-                logger.error('Iniciando con importacion a bd...')
+                logger.info('Iniciando con importacion a bd...')
                 then = time.time()
                 for x in self.get_distelec(txt_file):
 
@@ -92,7 +92,7 @@ class Command(BaseCommand):
         if options[0] == 'padron':
             self.del_padron_registry()
             with connection.cursor() as cursor:
-                logger.error('Iniciando de PADRON ELECTORAL, importacion a bd...')
+                logger.info('Iniciando de PADRON ELECTORAL, importacion a bd...')
 
                 then = time.time()
                 for x in self.get_padron(txt_file):
@@ -106,10 +106,7 @@ class Command(BaseCommand):
 
 
     def handle(self, *args, **kwargs):
-        logger.error('Iniciando con carga del archivo')
+        logger.info('Iniciando con carga del archivo')
         option = kwargs['option']
         file_name = kwargs['txt_file']
         self.loadDataView(file_name,option)
-        # x = threading.Thread(target=self.loadDataView, args=(file_name, option))
-        # x.start()
-        # x.join()
