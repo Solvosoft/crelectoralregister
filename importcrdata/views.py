@@ -241,6 +241,47 @@ def getListPaged(self, request, list_for_paging, amount_per_page):
 
     return list_paged
 
+import csv
+def generateCantonCSV(request, codigo):
+    obj = PadronElectoral.objects.filter(codele__startswith=codigo)
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="canton.csv"'
+    writer = csv.writer(response)
+    for y in obj:
+        writer.writerow([y.codele, y.cedula, y.nombre_completo])
+    return response
+
+def efficientCantonCSV(request, codigo):
+    obj = PadronElectoral.objects.filter(codele__startswith=codigo).values_list('codele', 'cedula', 'nombre_completo')
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="canton.csv"'
+    writer = csv.writer(response)
+    writer.writerows(obj)
+    return response
+
+import django_excel as excel
+def getCantonExcel(request, codigo):
+    query_sets = PadronElectoral.objects.filter(codele__startswith=codigo)
+    column_names = ['codele', 'cedula', 'nombre_completo']
+    return excel.make_response_from_query_sets(
+        query_sets,
+        column_names,
+        'xlsx',
+        file_name="canton"
+    )
+
+import json
+def getCantonJson(request, codigo):
+    query_sets = PadronElectoral.objects.filter(codele__startswith=codigo).values('codele', 'cedula', 'nombre_completo')
+
+    response = HttpResponse(json.dumps(list(query_sets)),content_type='text/json')
+    # response['Content-Disposition'] = 'attachment; filename="canton.csv"'
+    return response
+
+
+def showJson(request):
+    return render(request,'importcrdata/showjson.html', {})
 # METHOD THAT TESTS A CUSTOM DECORATOR
 @validRequest
 def testDecorator(request):
